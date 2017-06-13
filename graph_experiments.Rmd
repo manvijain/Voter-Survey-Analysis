@@ -1,0 +1,89 @@
+---
+title: "graph experiments"
+output: md_document
+---
+
+
+```{r libraries}
+library(ggplot2)
+library(dplyr)
+library(ggmosaic)
+library(tidyr)
+```
+
+```{r bar_graph_type1, echo = FALSE, eval = FALSE}
+dat <- data.frame(time = c("lunch", "dinner", "breakfast", "snacks"), price = c(700, 1000, 300, 500))
+
+ ggplot(data =dat, aes(x = time, y = price, fill = time ))+geom_bar(colour = "black", stat = "identity", width = 0.6)+guides(fill = FALSE)+xlab("meal of the day")+ylab("cost of the meal")+ggtitle("one day meal for 2 costs")
+```
+
+```{r load_data}
+load("selected_nzes2011.Rdata")
+
+```
+```{r convert_to_long_format ,echo = FALSE, eval = FALSE}
+selected_nzes2011$ID <- seq.int(nrow(selected_nzes2011))
+
+selected_nzes2011$ID<- factor(selected_nzes2011$ID)
+
+moneyOpinionColumns <- selected_nzes2011[, c("ID", "jsphealth", "jspedu", "jspunemp", "jspdefence", "jspsuper", "jspbusind", "jsppolice", "jspwelfare", "jspenviro")]
+
+data_long <- gather(moneyOpinionColumns, department, money_need, jsphealth:jspenviro, factor_key=TRUE)
+
+
+
+data_long <- data_long %>% filter(money_need == "More" | money_need == "Much more")
+
+data_long$department<- factor(data_long$department)
+data_long$money_need<- factor(data_long$money_need)
+
+levels(data_long$department) <- c("Health", "Education", "UnempBen", "Defence", "SuperAnn", "Business", "Police", "WelfareBen","Environ")
+
+ggplot(data =data_long, aes(x = department, fill = money_need))+geom_bar(colour = "black", stat = "count",width = 0.6)+xlab("sectors for investment")+ylab("no. of people")+ggtitle("which sector do people want the government to invest in?")
+
+```
+
+```{r for_people_more_discuss, echo = FALSE, eval = FALSE}
+selected_nzes2011$ID <- seq.int(nrow(selected_nzes2011))
+selected_nzes2011$ID<- factor(selected_nzes2011$ID)
+
+FrequentDiscussPeople <- selected_nzes2011 %>% filter(jdiscussp == "Yes, frequently")
+
+moneyOpinionColumns <- FrequentDiscussPeople[, c("ID", "jsphealth", "jspedu", "jspunemp", "jspdefence", "jspsuper", "jspbusind", "jsppolice", "jspwelfare", "jspenviro")]
+
+data_long <- gather(moneyOpinionColumns, department, money_need, jsphealth:jspenviro, factor_key=TRUE)
+
+
+
+data_long <- data_long %>% filter(money_need == "More" | money_need == "Much more")
+
+data_long$department<- factor(data_long$department)
+data_long$money_need<- factor(data_long$money_need)
+
+levels(data_long$department) <- c("Health", "Education", "UnempBen", "Defence", "SuperAnn", "Business", "Police", "WelfareBen","Environ")
+
+ggplot(data =data_long, aes(x = department, fill = money_need))+geom_bar(colour = "black", stat = "count",width = 0.6)+xlab("sectors for investment")+ylab("no. of people")+ggtitle("what do people who discuss politics frequently think?")
+```
+
+```{r mosaic_plot}
+selected_nzes2011$ID <- seq.int(nrow(selected_nzes2011))
+
+selected_nzes2011$ID<- factor(selected_nzes2011$ID)
+
+likeOpinionColumns <- selected_nzes2011[, c("ID", "jlablike","jnatlike", "jgrnlike","jnzflike", "jactlike", "junflike", "jmaolike", "jmnplike")]
+
+like_data_long <- gather(likeOpinionColumns, party, likeRating, jlablike:jmnplike, factor_key=TRUE)
+
+
+
+like_data_long <- like_data_long %>% filter(!is.na(likeRating), likeRating != "NA")
+
+like_data_long$party<- factor(like_data_long$party)
+#like_data_long$likeRating<- factor(like_data_long$likeRating)
+like_data_long$likeRating<- factor(like_data_long$likeRating, ordered=TRUE, levels = c("Don't know", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
+levels(like_data_long$likeRating)
+
+#like_data_long
+ggplot(data = like_data_long) + geom_mosaic(aes(weight = 1, x = product(likeRating, party), fill = factor(likeRating)),na.rm = TRUE)
+
+```

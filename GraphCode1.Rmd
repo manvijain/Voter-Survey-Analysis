@@ -1,0 +1,48 @@
+---
+title: "Voting_graph_code"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+```
+
+```{r load_data}
+
+```
+
+```{r age_segment}
+selected_nzes2011 <- selected_nzes2011 %>% mutate(age_strata=ifelse(jage>=18 & jage<=34,"youth", ifelse(jage>=35 & jage<=59,"middle", ifelse(jage>=60,"senior","unclassified"))))
+```
+
+```{r count_youth}
+selected_nzes2011 %>% filter(!is.na(jnzflike), jnzflike !="NA", !is.na(age_strata), age_strata !="NA", age_strata=="youth") %>% group_by(jnzflike,age_strata) %>% summarise(count = n())
+```
+
+```{r plot1}
+library(ggplot2)
+youth_jnzflike <- selected_nzes2011 %>% filter(!is.na(jnzflike), jnzflike !="NA", !is.na(age_strata), age_strata !="NA", age_strata=="youth") %>% group_by(jnzflike,age_strata)
+ggplot(youth_jnzflike, aes(x = factor(jnzflike))) +geom_bar()
+```
+
+
+```{r plot2}
+library(ggplot2)
+middle_jnzflike <- selected_nzes2011 %>% filter(!is.na(jnzflike), jnzflike !="NA", !is.na(age_strata), age_strata !="NA", age_strata=="middle") %>% group_by(jnzflike,age_strata)
+ggplot(middle_jnzflike, aes(x = factor(jnzflike))) +geom_bar()
+```
+
+```{r plot3}
+library(ggplot2)
+senior_jnzflike <- selected_nzes2011 %>% filter(!is.na(jnzflike), jnzflike !="NA", !is.na(age_strata), age_strata !="NA", age_strata=="senior") %>% group_by(jnzflike,age_strata)
+ggplot(senior_jnzflike, aes(x = factor(jnzflike))) +geom_bar()
+```
+
+```{r mean_jnzflikes}
+selected_nzes2011<- selected_nzes2011 %>% mutate(jnzflike_num = as.numeric(jnzflike))
+
+jnzflike_means <- selected_nzes2011 %>% filter(!is.na(jnzflike_num), jnzflike_num != "NA") %>% group_by(jage) %>% summarize(mean_dd = mean(jnzflike_num))
+
+ggplot(jnzflike_means, aes(x=jage, y=mean_dd)) +
+    geom_point(shape=1)+geom_smooth(method=lm)  
+```

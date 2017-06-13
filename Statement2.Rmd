@@ -1,0 +1,64 @@
+---
+title: "Voting_graph_code"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+```{r load_data}
+load("selected_nzes2011.Rdata")
+```
+
+
+```{r matrix}
+
+```
+
+```{r healthCount}
+health_count <- selected_nzes2011 %>% filter(jsphealth == "Much more" | jsphealth == "More") %>% summarize(count = n()) 
+```
+
+```{r eduCount}
+edu_count <- selected_nzes2011 %>% filter(jspedu == "Much more" | jspedu == "More") %>% summarize(count = n())
+```
+
+```{r busCount}
+bus_count <- selected_nzes2011 %>% filter(jspbusind == "Much more" | jspbusind == "More") %>% summarize(count = n())
+```
+```{r defenceCount}
+def_count <- selected_nzes2011 %>% filter(jspdefence == "Much more" | jspdefence == "More") %>% summarize(count = n())
+```
+
+```{r envCount}
+env_count <- selected_nzes2011 %>% filter(jspenviro == "Much more" | jspenviro == "More") %>% summarize(count = n())
+```
+```{r policeCount}
+pol_count <- selected_nzes2011 %>% filter(jsppolice == "Much more" | jsppolice == "More") %>% summarize(count = n())
+```
+
+```{r superAnnuationCount}
+sup_count <- selected_nzes2011 %>% filter(jspsuper == "Much more" | jspsuper == "More") %>% summarize(count = n())
+```
+
+
+```{r unemoloymentBenCount}
+unemp_count <- selected_nzes2011 %>% filter(jspunemp == "Much more" | jspunemp == "More") %>% summarize(count = n())
+str(unemp_count)
+```
+
+
+```{r welfareBenCount}
+wel_count <- selected_nzes2011 %>% filter(jspwelfare == "Much more" | jspwelfare == "More") %>% summarize(count = n())
+
+count_vec<- c(health_count[1,1],edu_count[1,1], bus_count[1,1],def_count[1,1], env_count[1,1],pol_count[1,1],sup_count[1,1], unemp_count[1,1], wel_count[1,1])
+
+count_vec
+count_frame <- data.frame(countSec = count_vec, sector = c("Health", "Education", "Business", "Defense", "Environment", "Police", "SuperAnn", "UnempBen", "WelfareBen"))
+count_frame
+```
+```{r graph}
+ggplot(count_frame, aes(x = sector,y = countSec )) +geom_col()
+```
